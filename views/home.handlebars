@@ -1,0 +1,127 @@
+<div class="page-header">
+  <h1 class="text-center">Conversation Topics</h1>
+</div>
+
+<script id="list-template" type="text/x-handlebars-template">
+  <li class="list-group-item">
+    <span>\{{body}}</span>
+    <button class="btn btn-xs \{{#if mylike}}btn-success\{{else}}btn-primary\{{/if}} like-button" data-msg-id="\{{id}}">
+      Like!
+      <span class="badge">\{{score}}</span>
+    </button>
+  </li>
+</script>
+
+<ul id="topic-box" class="list-group"></ul>
+
+<form action="">
+  <div class="input-group">
+    <input id="message-box" type="text" autocomplete="off" class="form-control" placeholder="Add a new topic...">
+    <span class="input-group-btn">
+      <button class="btn btn-default">＋ Send!</button>
+    </span>
+  </div>
+</form>
+
+<script src="//cdn.socket.io/socket.io-1.2.0.js"></script>
+<script src="//code.jquery.com/jquery-1.11.1.js"></script>
+<script>
+  var topics = JSON.parse(decodeURIComponent("{{{rowsJson}}}"));
+
+  $(document).ready(function() {
+    var source = $("#list-template").html();
+    var listTemplate = Handlebars.compile(source);
+
+    function redraw() {
+      $topicEl = $('#topic-box');
+      // Remove previous contents
+      $topicEl.empty();
+
+      // sort topics by score before placing
+      topics.sort(function(a,b) { return b['score']-a['score']; });
+
+      $.each(topics, function(index, topic) {
+        $topicEl.append(listTemplate(topic));
+      });
+    }
+
+    function refreshMyLikeStatus() {
+      var likeCookie = Cookies.getJSON('topiclikes')
+
+      $.each(topics, function(index, topic) {
+        if (typeof likeCookie !== 'undefined' && topic['id'] in likeCookie) {
+          topics[index]['mylike'] = likeCookie[topic['id']];
+        } else {
+          topics[index]['mylike'] = 0;
+        }
+      });
+    }
+
+    function changeLike(msgid, delta) {
+      var likeCookie = Cookies.getJSON('topiclikes');
+      if (typeof likeCookie === 'undefined') {
+        likeCookie = {};
+      }
+      if (!(msgid in likeCookie)) {
+        likeCookie[msgid] = 0;
+      }
+      likeCookie[msgid] += delta;
+      Cookies.set('topiclikes', likeCookie);
+      refreshMyLikeStatus();
+
+      // Make the score change before the socket update finalizes it, just for a good feeling of responsiveness
+      $.each(topics, function(index, topic) {
+         if (topic['id'] == msgid) {
+           topics[index]['score'] = topics[index]['score'] + delta;
+         }
+      });
+      redraw();
+
+      socket.emit('like changed', {'id': msgid, delta:delta});
+    }
+
+    refreshMyLikeStatus();
+    redraw();
+
+    var socket = io();
+    // Handle my new topic submission
+    $('form').submit(function(){
+      socket.emit('add topic', $('#message-box').val());
+      $('#message-box').val('');
+      return false;
+    });
+
+    $(document).on('click', '.like-button', function(event) {
+      var $target = $(event.target).closest('.like-button');
+      var msgid   = $target.attr('data-msg-id');
+
+      // if the like has already been added, remove it
+      if ($target.hasClass('btn-success')) {
+        $target.addClass('btn-primary').removeClass('btn-success');
+        changeLike(msgid, -1);
+      } else {
+        // if newly liked, add it
+        $target.addClass('btn-success').removeClass('btn-primary');
+        changeLike(msgid, 1);
+      }
+    });
+
+    // Handle message from socket
+    socket.on('add topic', function(result){
+      topics.push(result);
+      $('#topic-box').append(listTemplate(result));
+    });
+
+    // Handle like value changed event
+    socket.on('like changed', function(result){
+      // Update the topic score
+      $.each(topics, function(index, topic) {
+         if (topic['id'] == result['id']) {
+           topics[index]['score'] = result['score'];
+         }
+      });
+
+      redraw();
+    });
+  });
+</script>

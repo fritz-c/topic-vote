@@ -1,0 +1,17 @@
+body {
+    margin: auto;
+    max-width: 500px;
+    padding-bottom: 50px;
+}
+
+li.list-group-item {
+    padding-right: 70px;
+    position: relative;
+    overflow: hidden;
+}
+
+.like-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}

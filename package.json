@@ -1,0 +1,17 @@
+{
+  "name": "topic-vote",
+  "version": "0.0.1",
+  "description": "Conversation topic voting tool",
+  "dependencies": {
+    "express": "4.10.2",
+    "express-handlebars": "2.0.1",
+    "pg": "4.4.1",
+    "socket.io": "1.2.0"
+  },
+  "engines": {
+    "node": "0.10.x"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
