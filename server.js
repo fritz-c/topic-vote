@@ -19,6 +19,10 @@ app.get('/', function(req, res){
     client
       .query('SELECT * FROM msgs;', function (err, result) {
         done();
+        if (err) {
+          return console.error('error running query', err);
+        }
+
         res.render('home', {
           rowsJson: encodeURIComponent(JSON.stringify(result.rows))
         });
@@ -35,9 +39,12 @@ io.on('connection', function(socket){
         .query('INSERT INTO msgs (body, score) VALUES ($1, 0) RETURNING id',
           [msg],
           function (err, result) {
-            if (err) throw err;
-            io.emit('add topic', {id: result.rows[0].id, body: msg, score: 0});
             done();
+            if (err) {
+              return console.error('error running query', err);
+            }
+
+            io.emit('add topic', {id: result.rows[0].id, body: msg, score: 0});
           });
     });
 
@@ -52,9 +59,12 @@ io.on('connection', function(socket){
         .query('UPDATE msgs SET score = score + $1 WHERE id = $2 RETURNING score',
           [delta, msgid],
           function (err, result) {
-            if (err) throw err;
-            io.emit('like changed', {id: msgid, score: result.rows[0].score});
             done();
+            if (err) {
+              return console.error('error running query', err);
+            }
+
+            io.emit('like changed', {id: msgid, score: result.rows[0].score});
           });
     });
   });

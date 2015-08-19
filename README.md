@@ -2,17 +2,14 @@
 
 A socket-based voting tool for use in meetups, language exchange groups, etc.
 
-Heroku deploy:
+[![Deploy to Heroku](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
+Manual Heroku deploy:
 ```sql
 heroku create
 
 heroku addons:create heroku-postgresql:hobby-dev
-heroku pg:psql
-
-CREATE TABLE msgs (
-id SERIAL,
-body varchar,
-score int);
+node dbInit.js
 
 # to enable db access from local app:
 # get DATABASE_URL info from:

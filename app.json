@@ -1,0 +1,18 @@
+{
+  "name": "Conversation Topic Voting Tool",
+  "description": "A socket-based voting tool for use in meetups, language exchange groups, etc.",
+  "keywords": [
+    "education",
+    "language",
+    "socket.io"
+  ],
+  "addons": [
+    "heroku-postgresql:hobby-dev"
+  ],
+  "repository": "https://github.com/fritz-c/topic-vote",
+  "logo": "http://i.imgur.com/5a14VpH.png",
+  "success_url": "/",
+  "scripts": {
+    "postdeploy": "node dbInit.js"
+  }
+}

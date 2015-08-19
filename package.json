@@ -2,6 +2,11 @@
   "name": "topic-vote",
   "version": "0.0.1",
   "description": "Conversation topic voting tool",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/fritz-c/topic-vote"
+  },
+  "main": "server.js",
   "dependencies": {
     "express": "4.10.2",
     "express-handlebars": "2.0.1",
@@ -12,6 +17,6 @@
     "node": "0.10.x"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node server.js"
   }
 }
