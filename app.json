@@ -10,6 +10,7 @@
     "heroku-postgresql:hobby-dev"
   ],
   "repository": "https://github.com/fritz-c/topic-vote",
+  "license": "MIT",
   "logo": "http://i.imgur.com/5a14VpH.png",
   "success_url": "/",
   "scripts": {
