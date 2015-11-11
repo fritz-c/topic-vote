@@ -5,11 +5,15 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var port = process.env.PORT || 5000
 var pg = require('pg');
+var basicAuth = require('basic-auth-connect');
 
 app.use(express.static('public'));
 // Set up handlebars engine
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
+
+// Authenticator
+app.use(basicAuth(process.env.AUTH_USERNAME || 'username', process.env.AUTH_PASSWORD || 'secret123'));
 
 app.get('/', function(req, res){
   pg.connect(process.env.DATABASE_URL, function(err, client, done) {
